@@ -14,6 +14,7 @@ public class BibliotecaApp {
     private static ArrayList<Usuario> usuarios = new ArrayList<>();
     private static ArrayList<Prestamo> prestamos = new ArrayList<>();
     private static Map<Integer, Double> multas = new HashMap<>();
+    private static ArrayList<Categoria> categorias = new ArrayList<>();
     private static final double TARIFA_POR_DIA = 1.0;
     public int variablePrueba;
 
@@ -22,9 +23,14 @@ public class BibliotecaApp {
         int opcion;
 
         // Datos iniciales
-        libros.add(new Libro(1, "El Quijote", "Cervantes", "Novela"));
-        libros.add(new Libro(2, "Cien años de soledad", "García Márquez", "Novela"));
-        libros.add(new Libro(3, "La Sagrada Biblia", "Anónimo", "Novela"));
+        categorias.add(new Categoria("Terror"));
+        categorias.add(new Categoria("Aventura"));
+        categorias.add(new Categoria("Religion"));
+        categorias.add(new Categoria("Drama"));
+        libros.add(new Libro(1, "El Quijote", "Cervantes", categorias.get(1)));
+        libros.add(new Libro(2, "Cien años de soledad", "García Márquez", categorias.get(3)));
+        libros.add(new Libro(3, "La Sagrada Biblia", "Anónimo", categorias.get(2)));
+        libros.add(new Libro(3, "La Sagrada Familia", "Anónimo", categorias.get(0)));
         usuarios.add(new Usuario(1, "Miguel"));
         usuarios.add(new Usuario(2, "Enrique"));
         usuarios.add(new Usuario(3, "Juan"));
@@ -50,7 +56,7 @@ public class BibliotecaApp {
             System.out.println("18. Renovar préstamo");
             System.out.println("19. Mostrar multas usuario");
             System.out.println("20. Pagar multa");
-            System.out.println("21. Exportar libros (CSV)");
+            System.out.println("21. Registrar categoria");
             System.out.println("22. Ver usuarios registrados");
             System.out.println("23. Ver libros disponibles");
             System.out.println("24. Ver libros no disponibles");
@@ -60,7 +66,7 @@ public class BibliotecaApp {
             System.out.println("28. Buscar préstamo por libro");
             System.out.println("29. Ver préstamos vencidos");
             System.out.println("30. Ver préstamos activos");
-            System.out.println("31. Exportar préstamos (TXT)");
+            System.out.println("31. Ver categorias");
             System.out.println("32. Ordenar libros por título");
             System.out.println("33. Ordenar libros por autor");
             System.out.println("34. Ordenar libros por categoría");
@@ -72,7 +78,7 @@ public class BibliotecaApp {
             System.out.println("40. Ver top 3 usuarios con más préstamos");
             System.out.println("0. Salir");
             System.out.print("Opción: ");
-            opcion = sc.nextInt();
+            opcion = Integer.parseInt(sc.nextLine());
 
             switch (opcion) {
             case 1:
@@ -136,7 +142,7 @@ public class BibliotecaApp {
                 pagarMulta(sc);
                 break;
             case 21:
-                exportarLibrosCSV();
+                registrarCategoria(sc);
                 break;
             case 22:
                 verUsuarios();
@@ -166,7 +172,7 @@ public class BibliotecaApp {
                 verPrestamosActivos();
                 break;
             case 31:
-                exportarPrestamosTXT();
+            	verCategorias(sc);
                 break;
             case 32:
                 ordenarLibrosPorTitulo();
@@ -203,6 +209,9 @@ public class BibliotecaApp {
                 System.out.println("Opción inválida");
                 break;
         }
+            
+            System.out.println("Presiona enter para continuar ...");
+            sc.nextLine();
 
         } while (opcion != 0);
 
@@ -281,8 +290,8 @@ public class BibliotecaApp {
         System.out.print("ID: "); int id = sc.nextInt(); sc.nextLine();
         System.out.print("Título: "); String t = sc.nextLine();
         System.out.print("Autor: "); String a = sc.nextLine();
-        System.out.print("Categoría: "); String c = sc.nextLine();
-        libros.add(new Libro(id, t, a, c));
+        System.out.print("ID de Categoría: "); int c = sc.nextInt();
+        libros.add(new Libro(id, t, a, categorias.get(c)));
         System.out.println("Libro agregado.");
     }
 
@@ -314,7 +323,7 @@ public class BibliotecaApp {
     private static void buscarLibroPorCategoria(Scanner sc) {
         sc.nextLine();
         System.out.print("Categoría: "); String c = sc.nextLine();
-        for (Libro l : libros) if (l.getCategoria().equalsIgnoreCase(c)) System.out.println(l);
+        for (Libro l : libros) if (l.getCategoriaTexto().equalsIgnoreCase(c)) System.out.println(l);
     }
 
     private static void verDetallesLibro(Scanner sc) {
@@ -323,14 +332,14 @@ public class BibliotecaApp {
         if (l != null) {
             System.out.println("Título: " + l.getTitulo());
             System.out.println("Autor: " + l.getAutor());
-            System.out.println("Categoría: " + l.getCategoria());
+            System.out.println("Categoría: " + l.getCategoriaTexto());
             System.out.println("Estado: " + (l.isDisponible() ? "Disponible" : "Prestado"));
         }
     }
 
     private static void contarPorCategoria() {
         Map<String,Integer> mapa = new HashMap<>();
-        for (Libro l : libros) mapa.put(l.getCategoria(), mapa.getOrDefault(l.getCategoria(),0)+1);
+        for (Libro l : libros) mapa.put(l.getCategoriaTexto(), mapa.getOrDefault(l.getCategoriaTexto(),0)+1);
         System.out.println("Conteo por categoría: " + mapa);
     }
 
@@ -447,7 +456,7 @@ public class BibliotecaApp {
     }
 
     private static void ordenarLibrosPorCategoria() {
-        libros.sort((a,b)->a.getCategoria().compareToIgnoreCase(b.getCategoria()));
+        libros.sort((a,b)->a.getCategoriaTexto().compareToIgnoreCase(b.getCategoriaTexto()));
         mostrarLibros();
     }
 
@@ -506,20 +515,6 @@ public class BibliotecaApp {
             });
     }
 
-    private static void exportarLibrosCSV(){
-        try(FileWriter fw=new FileWriter("libros_export.csv")){
-            fw.write("id,titulo,autor,categoria,disponible\n");
-            for(Libro l:libros){
-                fw.write(l.getId()+","+escapeCsv(l.getTitulo())+","+escapeCsv(l.getAutor())+","+escapeCsv(l.getCategoria())+","+l.isDisponible()+"\n");
-            }
-            System.out.println("Exportado a libros_export.csv");
-        }catch(IOException e){System.out.println("Error:"+e.getMessage());}
-    }
-
-    private static String escapeCsv(String s){
-        if(s==null) return "";
-        return "\""+s.replace("\"","\"\"")+"\"";
-    }
 
     private static Libro buscarLibro(int id) {
         for (Libro l : libros) if (l.getId() == id) return l;
@@ -543,5 +538,25 @@ public class BibliotecaApp {
         return 0;
         
     }
+    
+    private static void registrarCategoria(Scanner sc) {
+        System.out.print("Nombre de la categoría: ");
+        String c = sc.nextLine();
+        
+        for (Categoria m : categorias) {
+        	if(m.getNombre() == c) {
+        		System.out.println("Categoría agregada.");
+        		return;
+        	}
+        }
+
+        System.out.println("La categoría ya existe.");
+
+    }
+
+    private static void verCategorias(Scanner sc) {
+    	for (Categoria c : categorias) System.out.println(c.getNombre());
+    }
+    
 }
 
