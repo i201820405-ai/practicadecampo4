@@ -15,6 +15,7 @@ public class BibliotecaApp {
     private static ArrayList<Prestamo> prestamos = new ArrayList<>();
     private static Map<Integer, Double> multas = new HashMap<>();
     private static final double TARIFA_POR_DIA = 1.0;
+    public int variablePrueba;
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
