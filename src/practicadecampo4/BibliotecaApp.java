@@ -1,7 +1,5 @@
 package practicadecampo4;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -434,15 +432,6 @@ public class BibliotecaApp {
 
     private static void verPrestamosActivos() {
         for (Prestamo p : prestamos) if (!p.isDevuelto()) System.out.println(p);
-    }
-
-    private static void exportarPrestamosTXT() {
-        try (FileWriter fw = new FileWriter("prestamos_export.txt")) {
-            for (Prestamo p : prestamos) fw.write(p.toString() + "\n");
-            System.out.println("Exportado a prestamos_export.txt");
-        } catch (IOException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
     }
 
     private static void ordenarLibrosPorTitulo() {

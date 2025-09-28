@@ -1,7 +1,6 @@
 package practicadecampo4;
 
 public class Categoria {
-    private String descripcion;
     private String nombre;
     private int id; 
     private static int contador = 1;
@@ -9,13 +8,11 @@ public class Categoria {
     public Categoria(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;
-        this.descripcion = "";
     }
     
     public Categoria(String nombre) {
         this.id = contador;
         this.nombre = nombre;
-        this.descripcion = "";
         contador++;
     }
 
